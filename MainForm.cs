@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-
-namespace FFMediaCacheGrabber
+﻿namespace FFMediaCacheGrabber
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Windows.Forms;
+    using System.IO;
+    using System.Text.RegularExpressions;
+
     using UInt8 = System.Byte;
     using Int8 = System.SByte;
 
+    // TODO: MP3 testing should come last
+    // TODO: MP3 test should be to initialize header and then run a header validation (move from MPEG frame code)
+    // TODO: Regular MP3 testing should consist of ID3 tag detection
+    // TODO: PNG, WebP, JPEG, GIF, BMP should all be relatively easy to detect
+    // TODO: FLV, MP4, Ogg should all be relatively easy to detect as well
+    // Hopefully most of these have easy to detect headers and aren't like MP3, which is a pain
+
     public partial class MainForm : Form
     {
-        //private string[] cachePaths;
         private FileSystemWatcher[] mediaCacheWatcher;
         private Regex googleTranslateMatch;
 
@@ -39,8 +37,8 @@ namespace FFMediaCacheGrabber
             if (!Directory.Exists(path))
             {
                 MessageBox.Show(path);
-                MessageBox.Show("Firefox doesn't appear to be installed. Portable versions are not supported.",
-                    "Firefox is not installed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Properties.Resources.MsgFirefoxNotInstalled, Properties.Resources.TitleFirefoxNotInstalled,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -48,14 +46,9 @@ namespace FFMediaCacheGrabber
 
             if (profilePaths.Length < 1)
             {
-                MessageBox.Show("Firefox doesn't appear to have been initialized. Run it first and restart program.", "Error");
+                MessageBox.Show(Properties.Resources.MsgFirefoxIsUninitialized, Properties.Resources.TitleError);
                 return;
             }
-
-            //cachePaths = new string[profilePaths.Length];
-
-            //for (int i = 0; i < profilePaths.Length; i++)
-            //    cachePaths[i] = profilePaths[i] + path2;
 
             mediaCacheWatcher = new FileSystemWatcher[profilePaths.Length];
 
@@ -123,7 +116,7 @@ namespace FFMediaCacheGrabber
                         filePath.Substring(filePath.LastIndexOf('\\') + 1),
                         "mp3",
                         newFileName,
-                        "Download",
+                        Properties.Resources.BtnDownload,
                         (new FileInfo(filePath)).LastWriteTime.Ticks,
                         filePath
                     });
@@ -186,7 +179,7 @@ namespace FFMediaCacheGrabber
                     e.Name,
                     "mp3",
                     newFileName,
-                    "Download",
+                    Properties.Resources.BtnDownload,
                     (new FileInfo(e.FullPath)).LastWriteTime.Ticks,
                     e.FullPath
                 });
@@ -200,10 +193,8 @@ namespace FFMediaCacheGrabber
         private bool HasStringInCell(DataGridView dataGridView, int cell, string search)
         {
             foreach (DataGridViewRow row in dataGridView.Rows)
-            {
                 if (row.Cells[cell].Value.ToString().Equals(search))
                     return true;
-            }
 
             return false;
         }
@@ -248,21 +239,6 @@ namespace FFMediaCacheGrabber
                         }
                     }
                 }
-
-                //var proc = new Process()
-                //{ 
-                //    StartInfo = new ProcessStartInfo()
-                //    {
-                //        FileName = "ffmpeg" + (Environment.Is64BitOperatingSystem ? "64" : "32") + @"\ffmpeg.exe",
-                //        Arguments = "-i \"" + path + "\" -map 0:a -codec:a copy -map_metadata -1 \"" + @"media\" + newName + "\"",
-                //        WorkingDirectory = Directory.GetCurrentDirectory()
-                //    },
-                //};
-
-                //proc.Start();
-
-
-                //File.Copy(path, @"media\" + newName);
             }
             catch { }
         }
